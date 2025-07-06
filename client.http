@@ -1,0 +1,22 @@
+POST http://localhost:8080/task
+Content-Type: application/json
+
+{
+  "title": "Estudar Clean Arch",
+  "description": "Task of teste",
+  "due_date": "2025-10-31T00:00:00Z"
+}
+
+###
+GET http://localhost:8080/tasks
+
+###
+PATCH http://localhost:8080/task/686a88da36c57f264ab0921b
+Content-Type: application/json
+
+{
+  "completed": false
+}
+
+###
+DELETE http://localhost:8080/task/686a88da36c57f264ab0921b

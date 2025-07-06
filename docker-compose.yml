@@ -1,0 +1,17 @@
+services:
+  db:
+    image: mongo:4.4
+    container_name: mongo-db
+    ports:
+      - 27018:27017
+    volumes:
+      - mongo-dbdata:/data/db
+      - mongo-configdb:/data/configdb
+    environment:
+      MONGO_INITDB_DATABASE: go-todolist
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  mongo-dbdata:
+  mongo-configdb:
