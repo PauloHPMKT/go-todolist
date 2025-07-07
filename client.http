@@ -2,7 +2,7 @@ POST http://localhost:8080/task
 Content-Type: application/json
 
 {
-  "title": "Estudar Golang",
+  "title": "Estudar Typescript",
   "description": "Task of teste",
   "due_date": "2025-09-10T00:00:00Z"
 }
