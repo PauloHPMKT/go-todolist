@@ -1,3 +1,7 @@
+// @title              TodoList API
+// @version            1.0
+// @description        This is a simple Todo List API using Go and MongoDB.
+// @host              localhost:8080
 package main
 
 import (
@@ -6,8 +10,13 @@ import (
 	"net/http"
 	"time"
 
+	_ "github.com/PauloHPMKT/go-todolist/docs"
+
+	"github.com/PauloHPMKT/go-todolist/middlewares"
 	"github.com/PauloHPMKT/go-todolist/schemas"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -30,6 +39,16 @@ func connectDB() {
   log.Println("Connected to MongoDB!")
 }
 
+// @Summary           Create a new task
+// @Description       Create a new task with title, description, and due date
+// @Tags              tasks
+// @Accept            json
+// @Produce           json
+// @Param             task     body      schemas.Task    true    "Task object"
+// @Success           201      {object}  map[string]interface{}
+// @Failure           400      {object}  map[string]string "Bad Request"
+// @Failure           500      {object}  map[string]string "Internal Server Error"
+// @Router            /task    [post]
 func createTask(c *gin.Context) {
   var task schemas.Task
   if err := c.ShouldBindJSON(&task); err != nil {
@@ -52,6 +71,13 @@ func createTask(c *gin.Context) {
   c.JSON(http.StatusCreated, gin.H{"id": result.InsertedID})
 }
 
+// @Summary           List all tasks
+// @Description       Retrieve a list of all tasks
+// @Tags              tasks
+// @Produce           json
+// @Success           200      {array}   schemas.Task
+// @Failure           500      {object}  map[string]string "Internal Server Error"
+// @Router            /tasks   [get]
 func listTasks(c *gin.Context) {
   ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
   defer cancel()
@@ -75,6 +101,18 @@ func listTasks(c *gin.Context) {
   c.JSON(http.StatusOK, tasks)
 }
 
+// @Summary           Update a task
+// @Description       Update an existing task by ID
+// @Tags              tasks
+// @Accept            json
+// @Produce           json
+// @Param             id       path      string    true    "Task ID"
+// @Param             task     body      schemas.Task  true    "Task object"
+// @Success           200      {object}  map[string]string "Task updated successfully"
+// @Failure           400      {object}  map[string]string "Bad Request"
+// @Failure           404      {object}  map[string]string "Task not found"
+// @Failure           500      {object}  map[string]string "Internal Server Error"
+// @Router            /task/{id} [patch]
 func updateTaks(c *gin.Context) {
   isParams := c.Params.ByName("id")
   objId, err := primitive.ObjectIDFromHex(isParams)
@@ -117,6 +155,15 @@ func updateTaks(c *gin.Context) {
   })
 }
 
+// @Summary           Delete a task
+// @Description       Delete an existing task by ID
+// @Tags              tasks
+// @Param             id       path      string    true    "Task ID"
+// @Success           200      {object}  map[string]string "Task deleted successfully"
+// @Failure           400      {object}  map[string]string "Bad Request"
+// @Failure           404      {object}  map[string]string "Task not found"
+// @Failure           500      {object}  map[string]string "Internal Server Error"
+// @Router            /task/{id} [delete]
 func deleteTask(c *gin.Context) {
   isParams := c.Params.ByName("id")
   objId, err := primitive.ObjectIDFromHex(isParams)
@@ -152,6 +199,9 @@ func deleteTask(c *gin.Context) {
 func main() {
   connectDB()
   router := gin.Default()
+  router.Use(middlewares.CorsMiddleware())
+
+  router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
   router.POST("/task", createTask)
   router.GET("/tasks", listTasks)

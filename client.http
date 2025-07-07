@@ -2,9 +2,9 @@ POST http://localhost:8080/task
 Content-Type: application/json
 
 {
-  "title": "Estudar Clean Arch",
+  "title": "Estudar Golang",
   "description": "Task of teste",
-  "due_date": "2025-10-31T00:00:00Z"
+  "due_date": "2025-09-10T00:00:00Z"
 }
 
 ###
